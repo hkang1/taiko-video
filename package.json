@@ -1,0 +1,31 @@
+{
+  "name": "taiko-video",
+  "version": "0.0.1",
+  "description": "A taiko plugin to record screencast as an mp4 video",
+  "main": "src/index.js",
+  "author": "Caleb Kang",
+  "license": "MIT",
+  "keywords": [
+    "taiko",
+    "plugin",
+    "chrome",
+    "screencast",
+    "video",
+    "recording",
+    "mp4"
+  ],
+  "bugs": {
+    "url": "https://github.com/hkang1/taiko-video/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hkang1/taiko-video.git"
+  },
+  "scripts": {
+    "lint": "eslint src/*.js"
+  },
+  "devDependencies": {
+    "eslint": "^7.14.0",
+    "sprintf-js": "^1.1.2"
+  }
+}
