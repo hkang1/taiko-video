@@ -17,6 +17,7 @@
   "bugs": {
     "url": "https://github.com/hkang1/taiko-video/issues"
   },
+  "homepage": "https://github.com/hkang1/taiko-video#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hkang1/taiko-video.git"
