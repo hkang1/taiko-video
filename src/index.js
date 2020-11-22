@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const spawn = require('child_process').spawn;
-const sprintf = require('sprintf-js').sprintf;
 
 const CAPTURE_OPTIONS = {
   format: 'jpeg',   // jpeg or png
@@ -21,6 +20,11 @@ const plugin = {
 
 const mkdir = (path) => {
   if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
+};
+
+const zeroPad = (number, digits = 3) => {
+  const nDigits = Math.ceil(Math.log10(number + 1));
+  return '0'.repeat(digits - nDigits) + number;
 };
 
 const start = async (filePath) => {
@@ -63,7 +67,7 @@ const stop = async () => {
   const basename = filename.substring(0, filename.length - 4);
   const directory = path.dirname(plugin.filePath);
   for (const [ index, base64Data ] of plugin.frames.entries()) {
-    const imagePath = sprintf('%s/%s%03d.%s', directory, basename, index + 1, CAPTURE_OPTIONS.format);
+    const imagePath = `${directory}/${basename}${zeroPad(index + 1)}.${CAPTURE_OPTIONS.format}`;
     fs.writeFile(imagePath, base64Data, 'base64', error => {
       if (error) console.error(error);
     });
@@ -73,8 +77,8 @@ const stop = async () => {
   const cmd = '/usr/local/bin/ffmpeg';
   const args = [
     '-y',
-    '-i', sprintf('%s/%s%%03d.%s', directory, basename, CAPTURE_OPTIONS.format),
-    '-s', sprintf('%dx%d', CAPTURE_OPTIONS.maxWidth, CAPTURE_OPTIONS.maxHeight),
+    '-i', `${directory}/${basename}%03d.${CAPTURE_OPTIONS.format}`,
+    '-s', `${CAPTURE_OPTIONS.maxWidth}x${CAPTURE_OPTIONS.maxHeight}`,
     '-codec:a', 'aac',
     '-b:a', '44.1k',
     '-r', '15',
@@ -93,10 +97,10 @@ const stop = async () => {
 
   // Delete the images upon building a movie successfully.
   proc.on('close', () => {
-    const regEx = new RegExp(sprintf('%s\\d{3}\\.%s', basename, CAPTURE_OPTIONS.format), 'i');
+    const regEx = new RegExp(`${basename}\\d{3}\\.${CAPTURE_OPTIONS.format}`, 'i');
     fs.readdirSync(directory)
       .filter(file => regEx.test(file))
-      .map(file => fs.unlinkSync(sprintf('%s/%s', directory, file)));
+      .map(file => fs.unlinkSync(`${directory}/${file}`));
   });
 };
 
