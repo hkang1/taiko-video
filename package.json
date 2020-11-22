@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "A taiko plugin to record screencast as an mp4 video",
   "main": "src/index.js",
-  "author": "Caleb Kang",
+  "author": "hkang1",
   "license": "MIT",
   "keywords": [
     "taiko",
@@ -27,5 +27,6 @@
   },
   "devDependencies": {
     "eslint": "^7.14.0"
-  }
+  },
+  "dependencies": {}
 }
