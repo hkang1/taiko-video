@@ -13,12 +13,12 @@ npm install --save-dev taiko-video
 Add this script in a file `script.js`.
 
 ```
-const { openBrowser, closeBrowser, click, video } = require('taiko');
+const { openBrowser, closeBrowser, click, goto, video } = require('taiko');
 
 (async () => {
     try {
         await openBrowser();
-        await video.startRecord('output.mp4');
+        await video.startRecord('output/video.mp4');
         await goto('gauge.org');
         await click('Plugins');
         // more actions
@@ -34,7 +34,7 @@ const { openBrowser, closeBrowser, click, video } = require('taiko');
 Run script with:
 ```
 taiko script.js
-taiko script.js --plugin taiko-video //Use --plugin to load a plugin in case of multiple plugins.
+taiko script.js --plugin video //Use --plugin to load a plugin in case of multiple plugins.
 ```
 
 
