@@ -1,6 +1,6 @@
 {
   "name": "taiko-video",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A taiko plugin to record screencast as an mp4 video",
   "main": "src/index.js",
   "author": "hkang1",
