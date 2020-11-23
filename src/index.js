@@ -8,6 +8,7 @@ const CAPTURE_OPTIONS = {
   maxWidth: 1280,
   maxHeight: 720,
 };
+const IMAGE_DIGITS = 4;
 
 const plugin = {
   client: null,
@@ -22,9 +23,16 @@ const mkdir = (path) => {
   if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
 };
 
-const zeroPad = (number, digits = 3) => {
+const zeroPad = (number, digits = IMAGE_DIGITS) => {
   const nDigits = Math.ceil(Math.log10(number + 1));
   return '0'.repeat(digits - nDigits) + number;
+};
+
+const frameHandler = frame => {
+  plugin.client.send('Page.screencastFrameAck', { sessionId: frame.sessionId });
+  plugin.deviceWidth = frame.metadata.deviceWidth;
+  plugin.deviceHeight = frame.metadata.deviceHeight;
+  plugin.frames.push(frame.data);
 };
 
 const start = async (filePath) => {
@@ -33,18 +41,7 @@ const start = async (filePath) => {
   mkdir(path.dirname(filePath));
 
   plugin.filePath = filePath;
-
-  plugin.client.on('Page.screencastFrame', frame => {
-    plugin.client.send('Page.screencastFrameAck', { sessionId: frame.sessionId });
-    plugin.deviceWidth = frame.metadata.deviceWidth;
-    plugin.deviceHeight = frame.metadata.deviceHeight;
-    plugin.frames.push(frame.data);
-  });
-
-  plugin.eventHandler.once('createdSession', client => {
-    plugin.client = client;
-    start(filePath);
-  });
+  plugin.client.on('Page.screencastFrame', frameHandler);
 
   await resume();
 };
@@ -77,7 +74,7 @@ const stop = async () => {
   const cmd = '/usr/local/bin/ffmpeg';
   const args = [
     '-y',
-    '-i', `${directory}/${basename}%03d.${CAPTURE_OPTIONS.format}`,
+    '-i', `${directory}/${basename}%0${IMAGE_DIGITS}d.${CAPTURE_OPTIONS.format}`,
     '-s', `${CAPTURE_OPTIONS.maxWidth}x${CAPTURE_OPTIONS.maxHeight}`,
     '-codec:a', 'aac',
     '-b:a', '44.1k',
@@ -92,12 +89,12 @@ const stop = async () => {
   if (process.env.DEBUG) {
     proc.stdout.on('data', data => console.log(data));
     proc.stderr.setEncoding('utf8');
-    proc.stderr.on('data', data => console.log(data));
+    proc.stderr.on('data', data => console.error(data));
   }
 
   // Delete the images upon building a movie successfully.
-  proc.on('close', () => {
-    const regEx = new RegExp(`${basename}\\d{3}\\.${CAPTURE_OPTIONS.format}`, 'i');
+  proc.once('close', () => {
+    const regEx = new RegExp(`${basename}\\d{${IMAGE_DIGITS}}\\.${CAPTURE_OPTIONS.format}`, 'i');
     fs.readdirSync(directory)
       .filter(file => regEx.test(file))
       .map(file => fs.unlinkSync(`${directory}/${file}`));
@@ -107,6 +104,7 @@ const stop = async () => {
 const clientHandler = async (taiko, eventHandler) => {
   plugin.eventHandler = eventHandler;
   plugin.eventHandler.on('createdSession', () => {
+    if (plugin.client) return;
     plugin.client = taiko.client();
   });
 };
