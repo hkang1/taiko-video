@@ -41,31 +41,48 @@ npm install --save-dev taiko-video
 
 Add this script in a file `script.js`.
 
-```
+```js
 const { openBrowser, closeBrowser, click, goto, video } = require('taiko');
 
 (async () => {
-    try {
-        await openBrowser();
-        await video.startRecord('output/video.mp4');
-        await goto('gauge.org');
-        await click('Plugins');
-        // more actions
-        // ...
-    } finally {
-        await video.stopRecord();
-        await closeBrowser();
-    }
+  try {
+    await openBrowser();
+    await video.startRecording('output/video.mp4');
+    await goto('https://www.linkedin.com/in/caleb-kang-8493651/');
+    await click('Plugins');
+    // more actions
+    // ...
+    await video.pauseRecording();
+    // more actions that you don't want recorded
+    // ...
+    await video.resumeRecording();
+    // more actions that you do want recorded
+    // ...
+  } finally {
+    await video.stopRecording();
+    await closeBrowser();
+  }
 })();
 
 ```
 
 Run script with:
 ```
-taiko script.js
-taiko script.js --plugin video //Use --plugin to load a plugin in case of multiple plugins.
+taiko script.js --plugin video
 ```
 
+## API
+
+These are the 4 available API functions.
+
+```js
+video.startRecording('path/to/movie.mp4');
+video.pauseRecording();
+video.resumeRecording();
+video.stopRecording();
+```
+
+`video.startRecording` must have an output movie file specified with a `.mp4` extension.
 
 ## License
 
