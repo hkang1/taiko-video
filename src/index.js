@@ -71,7 +71,7 @@ const stop = async () => {
   }
 
   // Create a mp4 movie out of the image frames.
-  const cmd = '/usr/local/bin/ffmpeg';
+  const cmd = '/usr/bin/ffmpeg';
   const args = [
     '-y',
     '-i', `${directory}/${basename}%0${IMAGE_DIGITS}d.${CAPTURE_OPTIONS.format}`,
