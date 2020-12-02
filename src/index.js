@@ -17,6 +17,7 @@ const plugin = {
   eventHandler: null,
   filePath: null,
   frames: [],
+  active: false,
 };
 
 const mkdir = (path) => {
@@ -29,6 +30,7 @@ const zeroPad = (number, digits = IMAGE_DIGITS) => {
 };
 
 const frameHandler = frame => {
+  if (!plugin.active) return;
   plugin.client.send('Page.screencastFrameAck', { sessionId: frame.sessionId });
   plugin.deviceWidth = frame.metadata.deviceWidth;
   plugin.deviceHeight = frame.metadata.deviceHeight;
@@ -41,6 +43,7 @@ const start = async (filePath) => {
   mkdir(path.dirname(filePath));
 
   plugin.filePath = filePath;
+  plugin.active = true;
   plugin.client.on('Page.screencastFrame', frameHandler);
 
   await resume();
@@ -55,9 +58,9 @@ const resume = async () => {
 };
 
 const stop = async () => {
-  // This is required so the screencast doesn't stop prematurely.
-  await new Promise(resolve => setTimeout(resolve, 500));
   await pause();
+
+  plugin.active = false;
 
   // Save frame as images first.
   const filename = path.basename(plugin.filePath);
@@ -103,9 +106,9 @@ const stop = async () => {
 
 const clientHandler = async (taiko, eventHandler) => {
   plugin.eventHandler = eventHandler;
-  plugin.eventHandler.on('createdSession', () => {
+  plugin.eventHandler.on('createdSession', async () => {
     if (plugin.client) return;
-    plugin.client = taiko.client();
+    plugin.client = await taiko.client();
   });
 };
 
