@@ -1,3 +1,4 @@
+const once = require('events').once;
 const fs = require('fs');
 const path = require('path');
 const spawn = require('child_process').spawn;
@@ -68,9 +69,11 @@ const stop = async () => {
   const directory = path.dirname(plugin.filePath);
   for (const [ index, base64Data ] of plugin.frames.entries()) {
     const imagePath = `${directory}/${basename}${zeroPad(index + 1)}.${CAPTURE_OPTIONS.format}`;
-    fs.writeFile(imagePath, base64Data, 'base64', error => {
-      if (error) console.error(error);
-    });
+    try {
+      fs.writeFileSync(imagePath, base64Data, 'base64');
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   // Create a mp4 movie out of the image frames.
@@ -95,13 +98,13 @@ const stop = async () => {
     proc.stderr.on('data', data => console.error(data));
   }
 
+  await once(proc, 'close');
+
   // Delete the images upon building a movie successfully.
-  proc.once('close', () => {
-    const regEx = new RegExp(`${basename}\\d{${IMAGE_DIGITS}}\\.${CAPTURE_OPTIONS.format}`, 'i');
-    fs.readdirSync(directory)
-      .filter(file => regEx.test(file))
-      .map(file => fs.unlinkSync(`${directory}/${file}`));
-  });
+  const regEx = new RegExp(`${basename}\\d{${IMAGE_DIGITS}}\\.${CAPTURE_OPTIONS.format}`, 'i');
+  fs.readdirSync(directory)
+    .filter(file => regEx.test(file))
+    .map(file => fs.unlinkSync(`${directory}/${file}`));
 };
 
 const clientHandler = async (taiko, eventHandler) => {
