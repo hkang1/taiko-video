@@ -76,6 +76,9 @@ const stop = async () => {
     }
   }
 
+  // Clear out the frame buffer.
+  plugin.frames = [];
+
   // Create a mp4 movie out of the image frames.
   const cmd = 'ffmpeg';
   const args = [
