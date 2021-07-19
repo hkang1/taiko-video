@@ -82,12 +82,12 @@ const stop = async () => {
   // Create a mp4 movie out of the image frames.
   const cmd = 'ffmpeg';
   const args = [
+    'vframes', '0.1',
     '-y',
     '-i', `${directory}/${basename}%0${IMAGE_DIGITS}d.${CAPTURE_OPTIONS.format}`,
     '-s', `${CAPTURE_OPTIONS.maxWidth}x${CAPTURE_OPTIONS.maxHeight}`,
     '-codec:a', 'aac',
     '-b:a', '44.1k',
-    '-r', '15',
     '-b:v', '1000k',
     '-c:v', 'h264',
     '-f', 'mp4',
@@ -118,6 +118,18 @@ const clientHandler = async (taiko, eventHandler) => {
   });
 };
 
+const slowConvert = async (videoPath, outputDir) => {
+  const outargs = [
+    '-i', videoPath,
+    '-vf', 'setpts=4*PTS',
+    outputDir+videoPath.substring(videoPath.lastIndexOf('/'))
+    ];
+
+  const proc1 = spawn('ffmpeg', outargs);
+
+  await once(proc1, 'close');
+}
+
 module.exports = {
   ID: 'video',
   init: clientHandler,
@@ -125,4 +137,5 @@ module.exports = {
   pauseRecording: pause,
   resumeRecording: resume,
   stopRecording: stop,
+  slowdownOutput: slowConvert,
 };
