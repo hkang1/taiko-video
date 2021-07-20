@@ -78,16 +78,18 @@ taiko script.js --plugin video
 
 ## API
 
-These are the 4 available API functions.
+These are the 5 available API functions.
 
 ```js
 video.startRecording('path/to/movie.mp4');
 video.pauseRecording();
 video.resumeRecording();
 video.stopRecording();
+slowdownRecording('output/video.mp4','./',2);
 ```
 
 `video.startRecording` must have an output movie file specified with a `.mp4` extension.
+`slowdownRecording` requires 3 formal parameters viz. `video-path`, `output-directory`, and finally, `fps`
 
 ## License
 
