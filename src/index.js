@@ -67,7 +67,7 @@ const stop = async () => {
   const filename = path.basename(plugin.filePath);
   const basename = filename.substring(0, filename.length - 4);
   const directory = path.dirname(plugin.filePath);
-  for (const [ index, base64Data ] of plugin.frames.entries()) {
+  for (const [index, base64Data] of plugin.frames.entries()) {
     const imagePath = `${directory}/${basename}${zeroPad(index + 1)}.${CAPTURE_OPTIONS.format}`;
     try {
       fs.writeFileSync(imagePath, base64Data, 'base64');
@@ -82,7 +82,6 @@ const stop = async () => {
   // Create a mp4 movie out of the image frames.
   const cmd = 'ffmpeg';
   const args = [
-    'vframes', '0.1',
     '-y',
     '-i', `${directory}/${basename}%0${IMAGE_DIGITS}d.${CAPTURE_OPTIONS.format}`,
     '-s', `${CAPTURE_OPTIONS.maxWidth}x${CAPTURE_OPTIONS.maxHeight}`,
@@ -108,6 +107,7 @@ const stop = async () => {
   fs.readdirSync(directory)
     .filter(file => regEx.test(file))
     .map(file => fs.unlinkSync(`${directory}/${file}`));
+
 };
 
 const clientHandler = async (taiko, eventHandler) => {
@@ -118,16 +118,17 @@ const clientHandler = async (taiko, eventHandler) => {
   });
 };
 
-const slowConvert = async (videoPath, outputDir) => {
-  const outargs = [
+const slowdownVideo = async (videoPath, outputDir, fps) => {
+  const args = [
+    '-y',
     '-i', videoPath,
-    '-vf', 'setpts=4*PTS',
-    outputDir+videoPath.substring(videoPath.lastIndexOf('/'))
-    ];
+    '-vf', 'setpts=N/(' + fps + '*TB)',
+    outputDir + videoPath.substring(videoPath.lastIndexOf('/'))
+  ];
 
-  const proc1 = spawn('ffmpeg', outargs);
+  const proc = spawn('ffmpeg', args);
 
-  await once(proc1, 'close');
+  await once(proc, 'close');
 }
 
 module.exports = {
@@ -137,5 +138,5 @@ module.exports = {
   pauseRecording: pause,
   resumeRecording: resume,
   stopRecording: stop,
-  slowdownOutput: slowConvert,
+  slowdownRecording: slowdownVideo,
 };
