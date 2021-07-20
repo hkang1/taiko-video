@@ -43,13 +43,17 @@ Add this script in a file `script.js`.
 
 ```js
 const { openBrowser, closeBrowser, click, goto, video } = require('taiko');
+const { slowdownRecording } = require('./src');
 
 (async () => {
   try {
     await openBrowser();
     await video.startRecording('output/video.mp4');
-    await goto('https://www.linkedin.com/in/caleb-kang-8493651/');
-    await click('Plugins');
+    await goto('https://www.google.com');
+    await write('youtube')
+    await click('google search');
+    await click('https://www.youtube.com');
+  
     // more actions
     // ...
     await video.pauseRecording();
@@ -60,6 +64,7 @@ const { openBrowser, closeBrowser, click, goto, video } = require('taiko');
     // ...
   } finally {
     await video.stopRecording();
+    await slowdownRecording('output/video.mp4','./',2);
     await closeBrowser();
   }
 })();
