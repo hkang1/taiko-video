@@ -10,7 +10,7 @@ const CAPTURE_OPTIONS = {
   maxHeight: 720,
 };
 const IMAGE_DIGITS = 4;
-const DEFAULT_FPS = 15;
+const DEFAULT_FPS = 8;
 
 const plugin = {
   client: null,
