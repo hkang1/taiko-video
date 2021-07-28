@@ -10,6 +10,7 @@ const CAPTURE_OPTIONS = {
   maxHeight: 720,
 };
 const IMAGE_DIGITS = 4;
+const DEFAULT_FPS = 8;
 
 const plugin = {
   client: null,
@@ -17,6 +18,7 @@ const plugin = {
   deviceWidth: 0,
   eventHandler: null,
   filePath: null,
+  fps: DEFAULT_FPS,
   frames: [],
   active: false,
 };
@@ -38,12 +40,13 @@ const frameHandler = frame => {
   plugin.frames.push(frame.data);
 };
 
-const start = async (filePath) => {
+const start = async (filePath, fps = DEFAULT_FPS) => {
   if (path.extname(filePath) !== '.mp4') throw new Error('Output file should have a .mp4 extension.');
 
   mkdir(path.dirname(filePath));
 
   plugin.filePath = filePath;
+  plugin.fps = fps;
   plugin.active = true;
   plugin.client.on('Page.screencastFrame', frameHandler);
 
@@ -87,10 +90,10 @@ const stop = async () => {
     '-s', `${CAPTURE_OPTIONS.maxWidth}x${CAPTURE_OPTIONS.maxHeight}`,
     '-codec:a', 'aac',
     '-b:a', '44.1k',
-    '-r', '15',
     '-b:v', '1000k',
     '-c:v', 'h264',
     '-f', 'mp4',
+    '-vf', `setpts=N/(${plugin.fps}*TB)`,
     plugin.filePath,
   ];
   const proc = spawn(cmd, args);
