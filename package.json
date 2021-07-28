@@ -23,7 +23,8 @@
     "url": "git+https://github.com/hkang1/taiko-video.git"
   },
   "scripts": {
-    "lint": "eslint src/*.js"
+    "lint": "eslint src/*.js",
+    "test": "exit 0"
   },
   "devDependencies": {
     "eslint": "^7.14.0"
