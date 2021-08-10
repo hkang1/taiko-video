@@ -116,7 +116,6 @@ const stop = async () => {
 const clientHandler = async (taiko, eventHandler) => {
   plugin.eventHandler = eventHandler;
   plugin.eventHandler.on('createdSession', async () => {
-    if (plugin.client) return;
     plugin.client = await taiko.client();
   });
 };
