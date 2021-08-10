@@ -48,7 +48,7 @@ const { openBrowser, closeBrowser, click, goto, video } = require('taiko');
   try {
     await openBrowser();
     await video.startRecording('output/video.mp4');
-    await goto('https://www.linkedin.com/in/caleb-kang-8493651/');
+    await goto('https://hoyoul.com');
     await click('Plugins');
     // more actions
     // ...
@@ -76,13 +76,13 @@ taiko script.js --plugin video
 These are the 4 available API functions.
 
 ```js
-video.startRecording('path/to/movie.mp4');
+video.startRecording('path/to/movie.mp4', <optional> frames-per-second);
 video.pauseRecording();
 video.resumeRecording();
 video.stopRecording();
 ```
 
-`video.startRecording` must have an output movie file specified with a `.mp4` extension.
+`video.startRecording` must have an output movie file specified with a `.mp4` extension. It also takes a 2nd optional frames per second parameter to control the speed of the video.
 
 ## License
 
